@@ -67,7 +67,6 @@ jobs:
         run: |
           set -euo pipefail
           git fetch --force --tags --quiet
-          echo "lab-marker: publisher main, commit after d5c9a0d"
           both='[{"platform":"linux/amd64","runner":"ubuntu-latest","arch":"amd64"},{"platform":"linux/arm64","runner":"ubuntu-24.04-arm","arch":"arm64"}]'
           amd='[{"platform":"linux/amd64","runner":"ubuntu-latest","arch":"amd64"}]'
           mode=skip tags= version= release_tag= create_release=false source= matrix=$both
