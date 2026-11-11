@@ -1,0 +1,28 @@
+name: RuboCop
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: Runner label.
+        type: string
+        # setup-ruby has no prebuilt Ruby 3.4.x for ubuntu-26.04 yet.
+        default: ubuntu-24.04
+
+permissions:
+  contents: read
+
+jobs:
+  rubocop:
+    name: RuboCop
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      # Known debt lives in the caller's .rubocop_todo.yml; anything new fails here.
+      - name: RuboCop
+        run: bundle exec rubocop --format github --format progress
