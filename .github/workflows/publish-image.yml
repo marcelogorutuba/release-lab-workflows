@@ -105,7 +105,15 @@ jobs:
             merged=$(git rev-parse -q --verify HEAD^2 || true)
             branch=""
             if [ -n "$merged" ]; then
-              branch=$(git branch -r --contains "$merged" --format='%(refname:short)' | grep '^origin/release/' | sort -V | tail -1 || true)
+              # Every cut brings main in, so later release branches contain this commit too:
+              # the branch whose head it is wins; containment is only the fallback.
+              branch=$(git branch -r --points-at "$merged" --format='%(refname:short)' | grep '^origin/release/' || true)
+              if [ -z "$branch" ]; then
+                branch=$(git branch -r --contains "$merged" --format='%(refname:short)' | grep '^origin/release/' || true)
+              fi
+              if [ "$(printf '%s\n' "$branch" | grep -c .)" -gt 1 ]; then
+                echo "::error::the merged commit belongs to more than one release branch: $(echo "$branch" | tr '\n' ' ')"; exit 1
+              fi
             fi
             if [ -z "$branch" ]; then
               echo "Push on main is not a merge of a release branch: nothing to publish."
